@@ -24,7 +24,8 @@ jobs:
       - name: Check for changes
         id: git_diff
         run: |
-          git diff --quiet --exit-code
+          git add .
+          git diff --cached --name-only --quiet --exit-code
           echo "::set-output name=has_changes::$?"
 
       - name: Commit changes
