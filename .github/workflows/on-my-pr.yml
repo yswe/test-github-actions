@@ -1,0 +1,38 @@
+name: File Regeneration
+on: pull_request
+
+permissions:
+  pull-requests: write
+
+jobs:
+  dependabot:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.user.login == 'yswe' && github.repository == 'yswe/test-github-actions'
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+        id: checkout
+        with:
+          ref: ${{ github.head_ref }} 
+
+      - name: Clone README.md
+        id: clone_readme
+        run: |
+          cp ./README.md ./README.md.backup
+
+      - name: Check for changes
+        id: git_diff
+        run: |
+          git diff --quiet --exit-code
+          echo "::set-output name=has_changes::$?"
+
+      - name: Commit changes
+        if: steps.git_diff.outputs.has_changes == '1'
+        run: |
+          git config user.name 'Yauheni Shybeka'
+          git config user.email 'yauheni.shybeka@gmail.com'
+          git add .
+          git commit -m "Auto-generated commit."
+
+      - name: Push changes
+        run: git push origin ${{ github.head_ref }}
